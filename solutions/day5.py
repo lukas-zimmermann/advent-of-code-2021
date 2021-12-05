@@ -1,94 +1,49 @@
-from input.day4 import input_boards, input_numbers
+from input.day5 import input_lines
 
 
-def solve_day4():
-    score = find_winning_board_score(input_numbers, input_boards)
-    print('Solution for day 4 puzzle 1:')
-    print('score: %d' % score)
+def solve_day5():
+    intersection_points = count_points_with_intersecting_lines(input_lines)
+    print('Solution for day 5 puzzle 1:')
+    print('intersection points: %d' % intersection_points)
 
     print()
 
-    score = find_last_board_score(input_numbers, input_boards)
-    print('Solution for day 4 puzzle 2:')
-    print('score: %d' % score)
+
+def count_points_with_intersecting_lines(lines):
+    diagram = create_empty_diagram(1000, 1000)
+
+    for line in lines:
+        # x coordinates are the same
+        if line[0] == line[2]:
+            for y in range(min(line[1], line[3]), max(line[1], line[3]) + 1):
+                diagram[line[0]][y] += 1
+        # y coordinates are the same
+        elif line[1] == line[3]:
+            for x in range(min(line[0], line[2]), max(line[0], line[2]) + 1):
+                diagram[x][line[1]] += 1
+        # diagonal line
+        else:
+            x_dir = 1 if line[0] < line[2] else -1
+            y_dir = 1 if line[1] < line[3] else -1
+            for i in range(0, abs(line[0] - line[2]) + 1):
+                diagram[line[0] + x_dir * i][line[1] + y_dir * i] += 1
+
+    return count_intersection_points(diagram)
 
 
-def find_winning_board_score(numbers, boards):
-    # we create a list with a board of 0s for each given board
-    marking_boards = get_marking_boards(boards)
+def create_empty_diagram(x, y):
+    diagram = []
+    for i in range(0, y):
+        diagram.append([0] * x)
 
-    for number in numbers:
-        mark_number(number, boards, marking_boards)
-
-        winning_board_index = find_winning_board(marking_boards)
-        if winning_board_index != -1:
-            return get_board_score(boards[winning_board_index], marking_boards[winning_board_index]) * number
+    return diagram
 
 
-def find_last_board_score(numbers, boards):
-    # we create a list with a board of 0s for each given board
-    marking_boards = get_marking_boards(boards)
+def count_intersection_points(diagram):
+    count = 0
+    for x in range(0, 1000):
+        for y in range(0, 1000):
+            if diagram[x][y] >= 2:
+                count += 1
 
-    for number in numbers:
-        mark_number(number, boards, marking_boards)
-
-        winning_board_index = find_winning_board(marking_boards)
-        if winning_board_index != -1:
-            if len(boards) <= 1:
-                return get_board_score(boards[0], marking_boards[0]) * number
-
-            remove_winning_boards(boards, marking_boards)
-
-
-def get_marking_boards(boards):
-    marking_boards = []
-    for board in boards:
-        marking_boards.append([0] * 25)
-
-    return marking_boards
-
-
-def mark_number(number, boards, marking_boards):
-    for i in range(0, len(boards)):
-        board = boards[i]
-        if number in board:
-            index = board.index(number)
-            marking_boards[i][index] = 1
-
-
-def find_winning_board(boards):
-    for board in boards:
-        if is_winning_board(board):
-            return boards.index(board)
-
-    return -1
-
-
-def is_winning_board(board):
-    for i in range(0, 5):
-        line = i * 5
-        if board[line] + board[line+1] + board[line+2] + board[line+3] + board[line+4] == 5:
-            return True
-
-        if board[i] + board[i+5] + board[i+10] + board[i+15] + board[i+20] == 5:
-            return True
-
-    return False
-
-
-def get_board_score(board, marking_board):
-    score = 0
-    for i in range(0, 25):
-        if marking_board[i] == 0:
-            score += board[i]
-
-    return score
-
-
-def remove_winning_boards(boards, marking_boards):
-    # we need to use a copy of the list because we will remove elements in the loop
-    for marking_board in list(marking_boards):
-        if is_winning_board(marking_board):
-            index = marking_boards.index(marking_board)
-            del boards[index]
-            del marking_boards[index]
+    return count
