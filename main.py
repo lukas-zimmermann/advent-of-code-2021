@@ -4,6 +4,7 @@ from solutions.day3 import solve_day3
 from solutions.day4 import solve_day4
 from solutions.day5 import solve_day5
 from solutions.day6 import solve_day6
+from solutions.day7 import solve_day7
 
 
 def main():
@@ -18,6 +19,8 @@ def main():
     solve_day5()
     print_divide()
     solve_day6()
+    print_divide()
+    solve_day7()
 
 
 def print_divide():
