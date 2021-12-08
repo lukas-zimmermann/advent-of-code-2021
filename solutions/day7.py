@@ -62,7 +62,8 @@ def calculate_lowest_fuel_cost_increasing(crab_positions):
         for j in range(0, len(crab_counts)):
             fuel_costs[i] += crab_counts[j] * calculate_fuel_cost_increasing(i, j)
 
-    return fuel_costs.index(min(fuel_costs)), min(fuel_costs)
+        if i and fuel_costs[i] > fuel_costs[i-1]:
+            return i - 1, fuel_costs[i-1]
 
 
 def calculate_fuel_cost_increasing(i, j):
